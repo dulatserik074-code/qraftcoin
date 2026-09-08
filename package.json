@@ -7,13 +7,18 @@
     "test": "hardhat test",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
-    "node": "hardhat node"
+    "node": "hardhat node",
+    "verify:sepolia": "hardhat run scripts/verify.ts --network sepolia",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@openzeppelin/contracts": "^5.4.0",
     "dotenv": "^17.2.2",
     "hardhat": "^2.26.3",
-    "typescript": "^5.9.2"
-  }
+    "typescript": "^5.9.2",
+    "ethers": "^6.17.0"
+  },
+  "description": "Experimental QraftCoin ERC-20 testnet integration prototype (source symbol QFT)",
+  "license": "MIT"
 }

@@ -8,3 +8,8 @@ frontend/.next/
 frontend/out/
 frontend/.env.local
 
+
+.env.*
+!.env.example
+!.env.local.example
+*.tsbuildinfo

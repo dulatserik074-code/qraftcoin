@@ -5,6 +5,20 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "strict": true,
-    "types": ["node", "mocha"]
-  }
+    "types": [
+      "node",
+      "mocha"
+    ]
+  },
+  "include": [
+    "hardhat.config.ts",
+    "config/**/*.ts",
+    "scripts/**/*.ts",
+    "test/**/*.ts",
+    "typechain-types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "frontend"
+  ]
 }

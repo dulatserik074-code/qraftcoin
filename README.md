@@ -1,168 +1,137 @@
-# Qraft Coin v0.2.0
+# QraftCoin (QFC)
 
-Qraft Coin (QFT) is a testnet-only, fixed-supply ERC-20 MVP. It includes audited OpenZeppelin building blocks, a transparent 5% payment-burn demo, Hardhat tests and deployment scripts, and a mobile-first Next.js wallet for MetaMask.
+Experimental ERC-20 utility token for game rewards, digital services and Web3 integration research.
 
-> QFT is currently a test token. Market price is not guaranteed. Do not use real funds or deploy this MVP to mainnet without an independent professional audit.
+![Solidity 0.8.28](https://img.shields.io/badge/Solidity-0.8.28-363636) ![Ethereum Sepolia](https://img.shields.io/badge/Network-Ethereum%20Sepolia-blue) ![ERC-20](https://img.shields.io/badge/Standard-ERC--20-blue) ![MIT](https://img.shields.io/badge/License-MIT-green)
 
-## Architecture
+> **Metadata notice:** QFC is the requested project branding. The supplied Solidity contract actually returns **Qraft Coin** / **QFT**. This repository preserves that contract. Wallets and integrations must use the actual metadata; QFC is not asserted to be its on-chain symbol.
 
-```text
-qraft-coin/
-├── contracts/
-│   ├── QraftCoin.sol       # Fixed-supply ERC20 + ERC20Burnable
-│   └── QraftPayment.sol    # 95% treasury / 5% burn payment demo
-├── scripts/deploy.ts       # Token and payment deployment
-├── test/                   # Hardhat unit tests
-├── frontend/               # Next.js 15 wallet and tokenomics UI
-├── hardhat.config.ts
-└── .env.example
-```
+## Overview
 
-`QraftCoin` mints exactly 1,000,000 QFT (18 decimals) to the deployer in its constructor. It has no public or privileged mint function, owner role, blacklist, fees, transfer restrictions, balance adjustment, confiscation, proxy, or upgrade mechanism.
+QraftCoin is an experimental ERC-20 utility token prototype designed to explore game rewards, digital services and Web3 integrations within the developing Qraft ecosystem. The maintainer reports an Ethereum Sepolia deployment, but the supplied archive includes no contract address or deployment receipt. Confirming that deployment remains TODO.
 
-`QraftPayment` accepts an approved QFT service payment. It transfers 95% directly from the payer to an immutable, explicitly configured treasury and calls the token's standard `burnFrom` for 5%. The burn rate is the public constant `BURN_RATE_BPS = 500` (500 / 10,000 = 5%). Ordinary QFT transfers have no payment burn or transaction tax.
+The current version is intended for development and integration testing. Potential experiments include in-game rewards, achievements, special events, loyalty rewards, access to selected digital features, experimental player-to-player transfers and Qraft application integrations. These are proposed use cases, not claims of completed integrations.
 
-There are two distinct burn mechanisms:
+QFC is a testnet project and has no guaranteed market value. It is not presented as an investment product. No price, exchange listing, return or confirmed corporate partnership is claimed.
 
-- Voluntary burn: holders call `QraftCoin.burn` to destroy their own QFT.
-- Payment burn: after approving `QraftPayment`, a service payment routes 95% to treasury and permanently burns 5%.
+## Network
 
-```text
-User pays 100 QFT
-→ 95 QFT treasury
-→ 5 QFT permanently burned
-```
+| Field | Value |
+| --- | --- |
+| Network | Ethereum Sepolia (chain ID 11155111) |
+| Project | QraftCoin (QFC branding) |
+| Contract token name | Qraft Coin |
+| Contract symbol | QFT |
+| Standard | ERC-20 |
+| Decimals | 18 |
+| Initial total supply | 1,000,000 QFT (1000000000000000000000000 base units) |
+| Current deployed total supply | TODO: query verified deployment; burns reduce supply |
+| Contract address | TODO |
+| Block explorer link | TODO: requires the actual contract address |
 
-## Requirements
+Sepolia Contract Address: TODO
 
-- Node.js 20 LTS or newer
-- npm
-- MetaMask (for the frontend)
-- Test ETH on Sepolia only when deploying to Sepolia
+Do not deploy a replacement just to fill this field. Obtain the existing address and transaction receipt from the maintainer, confirm Sepolia and bytecode, then read name(), symbol(), decimals() and totalSupply().
 
-## Installation
+## Smart Contract
 
-```bash
-npm install
-cd frontend
-npm install
-```
+[QraftCoin.sol](contracts/QraftCoin.sol) uses Solidity pragma ^0.8.28; Hardhat compiles with 0.8.28 and optimizer enabled for 200 runs. OpenZeppelin Contracts is declared as ^5.4.0 and locked to **5.6.1**. ERC20 and ERC20Burnable provide the token implementation and 18-decimal default.
 
-## Compile
+The constructor creates the entire 1,000,000-token supply for the deployer. There is no additional public mint, owner/admin role or upgrade mechanism. The deployer has ordinary holder rights. Holders can burn their tokens; burnFrom requires allowance. The initial supply is fixed, but current supply can decrease.
 
-From the repository root:
+The existing [QraftPayment.sol](contracts/QraftPayment.sol) is an optional payment demo: 95% goes to its immutable treasury and 5% is burned, with integer rounding down. Ordinary transfers have no payment fee or burn. See [technical tokenomics](docs/TOKENOMICS.md).
 
-```bash
-npx hardhat compile
-```
+This contract has not undergone a formal third-party security audit and should currently be treated as an experimental testnet implementation.
 
-## Tests
+## Developer Quick Start
 
-```bash
-npx hardhat test
-```
+Use Node.js 22 and npm. Clone the repository and open its root directory:
 
-Tests cover metadata, fixed supply, deployer allocation, transfers, allowances, `transferFrom`, `burn`, `burnFrom`, absence of mint, fixed payment burn rate, 95/5 routing, and input validation.
+~~~bash
+git clone https://github.com/dulatserik074-code/qraftcoin.git
+cd qraftcoin
+~~~
 
-## Local deployment
+~~~bash
+npm ci
+npm run compile
+npm test
+~~~
 
-Terminal 1:
+Local compile/tests use an ephemeral Hardhat chain and require no private key, RPC credential or Sepolia funds.
 
-```bash
-npx hardhat node
-```
+To read a player balance, copy .env.example to .env, set QFC_CONTRACT_ADDRESS to the verified address, optionally set SEPOLIA_RPC_URL, then run:
 
-Terminal 2:
+~~~bash
+node examples/ethers/qfc-example.js YOUR_PLAYER_WALLET_ADDRESS
+~~~
 
-```bash
-$env:TREASURY_ADDRESS="0x_VALID_LOCAL_TREASURY_ADDRESS" # PowerShell
-npm run deploy:local
-```
+The [read-only example](examples/ethers/qfc-example.js) checks Sepolia and contract code, reads decimals and symbol from the chain and returns a formatted balance. No signing key is needed.
 
-On macOS/Linux use `export TREASURY_ADDRESS=0x_VALID_LOCAL_TREASURY_ADDRESS`. The script prints the network, chain ID, deployer, treasury, QraftCoin address, QraftPayment address, and total supply. Add the local Hardhat network to MetaMask (`http://127.0.0.1:8545`, chain ID `31337`) and use only a development account shown by Hardhat.
+### Deployment and verification tooling
 
-## Sepolia deployment
+The existing deploy script creates **both a new token and a new payment contract**. It does not attach to an existing token. Running it requires a separate decision to deploy; no public-network deployment was performed during repository preparation.
 
-1. Run `npm install`.
-2. Copy `.env.example` to `.env`.
-3. Set `SEPOLIA_RPC_URL` to a trusted Sepolia RPC endpoint.
-4. Set `PRIVATE_KEY` to a dedicated testnet wallet private key. Never use a wallet that holds real assets and never commit `.env`.
-5. Set `TREASURY_ADDRESS` to a valid non-zero Sepolia address.
-6. Fund the deployment wallet with Sepolia faucet ETH.
-7. Compile and test: `npm run compile && npm test`.
-8. Deploy:
+For a deliberately authorized new Sepolia test deployment, configure SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY and TREASURY_ADDRESS in .env, then use:
 
-```bash
+~~~bash
 npm run deploy:sepolia
-```
+~~~
 
-No mainnet network is configured. Review the printed network before confirming any action.
-The deployment command detects `--network sepolia` directly from the Hardhat CLI arguments and fails before any network connection if the Sepolia RPC URL or private key is missing. The deploy script separately rejects a missing, invalid, or zero treasury address.
+For an existing token, source verification submits source code to Etherscan and needs no wallet key. Configure SEPOLIA_RPC_URL, ETHERSCAN_API_KEY and QFC_CONTRACT_ADDRESS, then use:
 
-## Frontend setup
+~~~bash
+npm run verify:sepolia
+~~~
 
-After deployment, copy `frontend/.env.local.example` to `frontend/.env.local` and set:
+Verification requires that deployed bytecode matches this compiler, optimizer and source. This command verifies QraftCoin only (no constructor arguments); verification of QraftPayment additionally requires its original token and treasury constructor arguments. See [security notes](docs/SECURITY.md).
 
-```dotenv
-NEXT_PUBLIC_QFT_ADDRESS=0x_DEPLOYED_QRAFTCOIN_ADDRESS
-NEXT_PUBLIC_QRAFT_PAYMENT_ADDRESS=0x_DEPLOYED_QRAFTPAYMENT_ADDRESS
-NEXT_PUBLIC_REQUIRED_CHAIN_ID=11155111
-NEXT_PUBLIC_NETWORK_NAME=Sepolia
-NEXT_PUBLIC_BLOCK_EXPLORER_URL=https://sepolia.etherscan.io
-```
+### Existing wallet frontend
 
-Run the wallet:
+The supplied Next.js frontend is retained. Inside frontend/, run npm ci, copy .env.local.example to .env.local and set the verified token/payment addresses. The existing NEXT_PUBLIC_QFT_ADDRESS name intentionally matches source metadata. Run npm run dev and open localhost:3000. Validation commands are npm test, npm run lint and npm run build.
 
-```bash
-cd frontend
-npm run dev
-```
+It supports wallet connection, transfers, voluntary burns and the approved payment demo. These can change token balances when used against a deployed contract; a balance-only game does not need them.
 
-Open `http://localhost:3000`. The app connects to the injected MetaMask provider, blocks writes on the wrong network, can request a switch to Sepolia, and supports `transfer`, voluntary `burn`, and the approve-then-pay QraftPayment flow. Payment previews use 18-decimal integer arithmetic and show the treasury and burn amounts before confirmation. Balance, supply, allowance, transaction state, errors, success, and network-aware explorer links are refreshed in the UI.
+## Game Integration
 
-Production checks:
+Start with [the integration guide](docs/GAME_INTEGRATION.md) and [game developer starter](examples/game-integration/README.md):
 
-```bash
-npm run lint
-npm run build
-npm start
-```
+1. Read balances through a compatible wallet and the ERC-20 contract.
+2. Validate rewards on a game server and transfer existing test tokens from an authorized reward wallet.
+3. Explore optional in-game utility, clearly separated from real implemented game economics.
 
-## Add QFT to MetaMask
+Never put a reward wallet private key in frontend code. No token purchase or financial commitment is required for experimental integrations.
 
-1. Switch MetaMask to Sepolia (or the configured local Hardhat network).
-2. Select **Import tokens**.
-3. Paste the deployed QraftCoin address printed by the deploy script.
-4. Confirm symbol `QFT` and decimals `18`.
-5. Verify the address against your deployment output before importing.
+## Add QFC to MetaMask
 
-## Security notes
+1. Switch to Ethereum Sepolia (enable test networks if needed).
+2. Open Import Tokens.
+3. Enter the verified QraftCoin contract address: **TODO**.
+4. Check the actual symbol: **QFT**, decimals **18** for the supplied source. QFC is project branding.
+5. Confirm import only after checking the address and metadata.
 
-- OpenZeppelin ERC-20, ERC20Burnable, SafeERC20, and ReentrancyGuard are used instead of custom token primitives.
-- Supply is fixed in the constructor; there is no callable mint path after deployment.
-- Token and treasury addresses are validated against the zero address and are immutable.
-- Payment calculations use basis points and Solidity 0.8 checked arithmetic. The treasury receives `amount - burnAmount`, so rounding cannot create tokens.
-- Integer division rounds the 5% burn down to the nearest token wei. For payments below 20 wei, the burn is zero and the full amount goes to treasury; this is documented and tested. No value is lost or trapped.
-- `nonReentrant` guards the payment flow; state does not depend on callbacks.
-- Payments require an explicit user allowance. Approve only the intended amount and contract. Be aware of the standard ERC-20 allowance-change race; set an allowance to zero before replacing a non-zero allowance when interacting manually.
-- The token has no admin access control because it has no post-deploy administrative functions.
-- No hidden fee, honeypot, blacklist, sale restriction, confiscation, forced balance change, or upgradeability exists.
-- Unit tests are useful but are not a substitute for an independent audit.
-- This is a testnet MVP and has not received an independent smart-contract audit. Do not deploy to mainnet or use significant value before one.
-- A production treasury should preferably be a multisig such as Safe rather than a single externally owned account. No Safe dependency is required by these contracts.
+## Looking for Integration Partners
 
-## Tokenomics
+QraftCoin is currently looking for indie game developers, Web3 builders and experimental projects interested in testing QFC integrations on Ethereum Sepolia.
 
-- Name: Qraft Coin
-- Symbol: QFT
-- Decimals: 18
-- Initial and maximum supply: 1,000,000 QFT
-- Additional minting: disabled
-- Voluntary `burn` and allowance-based `burnFrom`: enabled
-- Payment demo: 95% treasury / 5% burn
+Possible experiments include game rewards, achievements, tournament rewards, loyalty mechanics, wallet-based access, special events and cross-project experiments.
 
-Potential future utility includes AI services, subscriptions, digital products, rewards, and payments. Burn reduces token supply but **DOES NOT guarantee token price appreciation**, demand, or liquidity.
+At this stage, QraftCoin is a testnet prototype. No token purchase or financial commitment is required for experimental integrations.
+
+Contact: [dulatserik074-code on GitHub](https://github.com/dulatserik074-code).
+
+## Qraft Ecosystem
+
+Qraft is being developed as a broader ecosystem for software, applications, games and digital services. QraftCoin is being explored as a potential utility layer within that ecosystem. Future integrations are experimental and subject to technical, economic and legal evaluation.
+
+## Documentation and contributions
+
+- [Technical tokenomics](docs/TOKENOMICS.md)
+- [Game integration](docs/GAME_INTEGRATION.md)
+- [Security](docs/SECURITY.md)
+- [Experimental roadmap](docs/ROADMAP.md)
+- [Contributing](CONTRIBUTING.md)
 
 ## License
 
-MIT
+[MIT](LICENSE), preserved from the original project.
