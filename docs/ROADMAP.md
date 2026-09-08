@@ -2,22 +2,18 @@
 
 This is an experimental direction, not a delivery or mainnet commitment.
 
-## Phase 1 — Prototype
+## Phase 1 — QFC Standardization
 
-- Implemented in source: ERC-20 token, transfers, voluntary burn and payment demo.
-- Sepolia deployment: reported by the maintainer; address and deployment evidence TODO.
-- Wallet testing against the deployed instance: TODO; local tests are separate evidence.
+Included: QFC contract standardization, QFC tests, developer documentation and GitHub publication.
 
-## Phase 2 — Developer Integration
+## Phase 2 — Sepolia Prototype (planned)
 
-- Public documentation and JavaScript balance example: included in this repository.
-- Planned: validated server-side game reward prototype.
-- Planned: first external test integration and feedback.
+Ethereum Sepolia deployment (separate approval required), contract verification, wallet testing and a game integration demo. The current QFC deployment is pending.
 
-## Phase 3 — Qraft Ecosystem
+## Phase 3 — Developer Experiments (planned)
 
-Potential future experiments include Qraft applications, digital services, loyalty systems, game integrations and partner reward mechanics. No partner relationship or implemented external integration is claimed.
+First external game integration, validated reward prototype and developer feedback. Potential experiments include game rewards, Qraft applications, digital services and loyalty mechanics. No existing partnership is claimed.
 
 ## Phase 4 — Production Evaluation
 
-Only after sufficient testing: independent security review, economic model review, legal/regulatory review and mainnet feasibility analysis. Production use remains under evaluation; no mainnet launch is promised.
+Security review, economic model review, legal evaluation and possible production architecture. Production use remains under evaluation; no mainnet launch is promised.

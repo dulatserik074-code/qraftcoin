@@ -1,9 +1,12 @@
-export const QFT_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_QFT_ADDRESS || "";
+export const QFC_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_QFC_ADDRESS || "";
 export const QRAFT_PAYMENT_ADDRESS = process.env.NEXT_PUBLIC_QRAFT_PAYMENT_ADDRESS || "";
 export const SUPPORTED_CHAIN_ID = Number(process.env.NEXT_PUBLIC_REQUIRED_CHAIN_ID || "11155111");
 export const NETWORK_NAME = process.env.NEXT_PUBLIC_NETWORK_NAME || "Sepolia";
 export const BLOCK_EXPLORER_URL = process.env.NEXT_PUBLIC_BLOCK_EXPLORER_URL || "https://sepolia.etherscan.io";
-export const QFT_ABI = [
+export const QFC_ABI = [
+  "function name() view returns (string)",
+  "function symbol() view returns (string)",
+  "function decimals() view returns (uint8)",
   "function balanceOf(address) view returns (uint256)",
   "function totalSupply() view returns (uint256)",
   "function allowance(address owner, address spender) view returns (uint256)",
@@ -16,4 +19,10 @@ export const PAYMENT_ABI = ["function pay(uint256 amount)"] as const;
 
 export function explorerUrl(chainId: number | null, kind: "address" | "tx", value: string) {
   return chainId === SUPPORTED_CHAIN_ID ? `${BLOCK_EXPLORER_URL.replace(/\/$/, "")}/${kind}/${value}` : undefined;
+}
+
+export function assertQFCMetadata(name: string, symbol: string, decimals: bigint) {
+  if (name !== "Qraft Coin" || symbol !== "QFC" || decimals !== 18n) {
+    throw new Error("Expected Qraft Coin / QFC / 18 decimals. Check the configured token address.");
+  }
 }

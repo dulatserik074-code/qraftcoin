@@ -1,6 +1,6 @@
 # Game integration
 
-QFC is project branding. The supplied token source uses Qraft Coin / QFT. Confirm the deployed metadata instead of hard-coding QFC in wallet displays. Sepolia address: TODO. No token purchase or financial commitment is required for experiments.
+The current token is Qraft Coin (QFC). Sepolia deployment is pending. Use the verified new address after deployment. No token purchase or financial commitment is required for experiments.
 
 ## Level 1 — Read QFC balance
 
@@ -41,6 +41,7 @@ export async function connectAndReadBalance(tokenAddress) {
   const [balance, decimals, symbol] = await Promise.all([
     token.balanceOf(player), token.decimals(), token.symbol()
   ]);
+  if (symbol !== "QFC") throw new Error("Expected QFC; check the configured token address.");
   return { player, balance: ethers.formatUnits(balance, decimals), symbol };
 }
 ~~~
@@ -56,7 +57,7 @@ Reward validation
   ↓
 Authorized reward wallet/service
   ↓
-QFC transfer (actual source symbol: QFT)
+QFC transfer
   ↓
 Player wallet
 ~~~
@@ -78,7 +79,7 @@ Illustrative design examples only, not existing economics or exchange rates:
 | 50 QFC | Bonus item |
 | QFC reward | Achievement reward |
 
-Use actual deployed metadata (QFT for this source) in implementation. Choose whether access checks a balance or consumes a transfer; these are different designs. Balance checks alone do not reserve tokens, so recheck at use time. For payments, validate confirmed contract events on the server before granting the item and prevent duplicate grants. Explain spending and any burn before wallet approval.
+Validate the deployed symbol is QFC before integration. Choose whether access checks a balance or consumes a transfer; these are different designs. Balance checks alone do not reserve tokens, so recheck at use time. For payments, validate confirmed contract events on the server before granting the item and prevent duplicate grants. Explain spending and any burn before wallet approval.
 
 The optional QraftPayment demo routes 95% to treasury and burns 5%. It does not implement inventory, event entry, refunds or reward validation. Do not silently use its burn behavior for an example that only needs a balance check.
 

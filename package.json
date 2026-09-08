@@ -19,6 +19,6 @@
     "typescript": "^5.9.2",
     "ethers": "^6.17.0"
   },
-  "description": "Experimental QraftCoin ERC-20 testnet integration prototype (source symbol QFT)",
+  "description": "Experimental QraftCoin ERC-20 testnet integration prototype (source symbol QFC)",
   "license": "MIT"
 }

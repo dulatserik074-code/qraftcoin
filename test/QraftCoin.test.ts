@@ -11,11 +11,11 @@ describe("QraftCoin", function () {
   it("has the correct name and symbol", async () => {
     const { token } = await deployFixture();
     expect(await token.name()).to.equal("Qraft Coin");
-    expect(await token.symbol()).to.equal("QFT");
+    expect(await token.symbol()).to.equal("QFC");
     expect(await token.decimals()).to.equal(18);
   });
 
-  it("mints exactly 1,000,000 QFT to the deployer", async () => {
+  it("mints exactly 1,000,000 QFC to the deployer", async () => {
     const { token, deployer } = await deployFixture();
     const supply = ethers.parseEther("1000000");
     expect(await token.totalSupply()).to.equal(supply);
