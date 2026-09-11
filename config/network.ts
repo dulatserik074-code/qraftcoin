@@ -12,6 +12,6 @@ export function selectedHardhatNetwork(argv: readonly string[]) {
 
 export function validateSepoliaEnvironment(networkName: string | undefined, environment: DeploymentEnvironment) {
   if (networkName !== "sepolia") return;
-  if (!environment.SEPOLIA_RPC_URL) throw new Error("SEPOLIA_RPC_URL is required for Sepolia");
-
+  if (!environment.SEPOLIA_RPC_URL) throw new Error("SEPOLIA_RPC_URL is required for Sepolia deployment");
+  if (!environment.PRIVATE_KEY) throw new Error("PRIVATE_KEY is required for Sepolia deployment");
 }

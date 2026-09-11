@@ -1,6 +1,6 @@
 {
-  "name": "qraft-coin",
-  "version": "0.2.0",
+  "name": "qazloyal",
+  "version": "0.4.1",
   "private": true,
   "scripts": {
     "compile": "hardhat compile",
@@ -8,7 +8,6 @@
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia",
     "node": "hardhat node",
-    "verify:sepolia": "hardhat run scripts/verify.ts --network sepolia",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
@@ -16,9 +15,10 @@
     "@openzeppelin/contracts": "^5.4.0",
     "dotenv": "^17.2.2",
     "hardhat": "^2.26.3",
-    "typescript": "^5.9.2",
-    "ethers": "^6.17.0"
+    "typescript": "^5.9.2"
   },
-  "description": "Experimental QraftCoin ERC-20 testnet integration prototype (source symbol QFC)",
-  "license": "MIT"
+  "description": "QazLoyal — digital loyalty platform for small and medium businesses",
+  "engines": {
+    "node": ">=22 <23"
+  }
 }

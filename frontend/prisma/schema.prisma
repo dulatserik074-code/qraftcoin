@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+enum Role {
+  BUSINESS_OWNER
+  EMPLOYEE
+  CUSTOMER
+}
+enum TransactionType {
+  EARN
+  REDEEM
+  BONUS
+  ADJUSTMENT
+  EXPIRE
+}
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique
+  passwordHash String
+  authVersion Int @default(0)
+  role Role @default(BUSINESS_OWNER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  business Business?
+  staff BusinessStaff[]
+  customer Customer?
+  sessions Session[]
+  passwordResets PasswordReset[]
+  transactions LoyaltyTransaction[]
+}
+model Session {
+  id String @id
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+  @@index([userId])
+}
+model Business {
+  id String @id @default(uuid()) @db.Uuid
+  ownerId String @unique @db.Uuid
+  owner User @relation(fields: [ownerId], references: [id])
+  name String
+  description String @default("")
+  currency String @default("KZT")
+  rewardRateBps Int @default(500)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  staff BusinessStaff[]
+  invitations Invitation[]
+  customers BusinessCustomer[]
+  transactions LoyaltyTransaction[]
+}
+model BusinessStaff {
+  businessId String @db.Uuid
+  userId String @db.Uuid
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([businessId, userId])
+  @@index([userId, active])
+}
+model Customer {
+  id String @id @default(uuid()) @db.Uuid
+  userId String? @unique @db.Uuid
+  user User? @relation(fields: [userId], references: [id])
+  name String
+  phone String?
+  email String?
+  qrCode String @unique @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  businesses BusinessCustomer[]
+}
+model BusinessCustomer {
+  id String @id @default(uuid()) @db.Uuid
+  businessId String @db.Uuid
+  customerId String @db.Uuid
+  business Business @relation(fields: [businessId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+  publicId String @unique @default(uuid()) @db.Uuid
+  pointsBalance BigInt @default(0)
+  lifetimePoints BigInt @default(0)
+  totalSpent BigInt @default(0)
+  totalPurchases Int @default(0)
+  lastPurchaseAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions LoyaltyTransaction[]
+  @@unique([businessId, customerId])
+  @@index([businessId, lastPurchaseAt])
+  @@index([customerId])
+}
+model LoyaltyTransaction {
+  id String @id @default(uuid()) @db.Uuid
+  businessId String @db.Uuid
+  customerId String @db.Uuid
+  employeeId String? @db.Uuid
+  business Business @relation(fields: [businessId], references: [id])
+  membership BusinessCustomer @relation(fields: [businessId, customerId], references: [businessId, customerId])
+  employee User? @relation(fields: [employeeId], references: [id])
+  type TransactionType
+  purchaseAmount BigInt?
+  points BigInt
+  description String?
+  idempotencyKey String @db.Uuid
+  requestHash String
+  createdAt DateTime @default(now())
+  @@unique([businessId, idempotencyKey])
+  @@index([businessId, createdAt, id])
+  @@index([businessId, customerId, createdAt])
+  @@index([employeeId])
+}
+model PasswordReset {
+  tokenHash String @id
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([expiresAt])
+}
+model Invitation {
+  id String @id @default(uuid()) @db.Uuid
+  businessId String @db.Uuid
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  email String
+  role Role @default(EMPLOYEE)
+  tokenHash String @unique
+  expiresAt DateTime
+  acceptedAt DateTime?
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  @@index([businessId, createdAt])
+  @@index([expiresAt])
+}
+model RateLimit {
+  key String @id
+  count Int
+  expiresAt DateTime
+  @@index([expiresAt])
+}

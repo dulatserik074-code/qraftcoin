@@ -1,0 +1,27 @@
+.cards {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  min-width: 0;
+}
+.card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel2);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.card dl { display: grid; gap: 12px; margin: 0; }
+.card dt { color: #afbeb5; font-size: 14px; }
+.card dd { margin: 2px 0 0; }
+.customer { font-weight: 600; }
+.points { font-size: 18px; font-weight: 600; }
+.credit { color: #a8e4c2; }
+.debit { color: #efb9b1; }
+/* Avoid displaying the server-rendered table on mobile before hydration. */
+@media (max-width: 767px) { .desktop { display: none; } }

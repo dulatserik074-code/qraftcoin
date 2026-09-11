@@ -1,15 +1,32 @@
+# Secrets: examples alone are versioned
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*credentials*.json
+# Generated artifacts
 node_modules/
+.next/
+.netlify/
 artifacts/
 cache/
 typechain-types/
-.env
 coverage/
-frontend/.next/
-frontend/out/
-frontend/.env.local
-
-
-.env.*
-!.env.example
-!.env.local.example
+out/
 *.tsbuildinfo
+*.log
+# Local QA data and output
+qa/v041/
+qa/v03/
+qa/v04/
+qa/mobile-history/
+*outbox*.jsonl
+*browser-state*.json
+*.db
+*.sqlite*
+pgdata/
+work/

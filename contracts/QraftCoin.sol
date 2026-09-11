@@ -9,7 +9,7 @@ import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC2
 contract QraftCoin is ERC20, ERC20Burnable {
     uint256 public constant MAX_SUPPLY = 1_000_000 ether;
 
-    constructor() ERC20("Qraft Coin", "QFC") {
+    constructor() ERC20("Qraft Coin", "QFT") {
         _mint(msg.sender, MAX_SUPPLY);
     }
 }

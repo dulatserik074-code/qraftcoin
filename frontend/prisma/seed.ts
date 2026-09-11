@@ -1,0 +1,30 @@
+import { existsSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+if (existsSync(".env")) process.loadEnvFile(".env");
+const { db } = await import("../server/db");
+const { register } = await import("../server/authService");
+const { createBusiness } = await import("../server/businessService");
+const { createCustomer, listCustomers } = await import("../server/customerService");
+const { inviteEmployee, acceptInvitation } = await import("../server/employeeService");
+const { transactReward } = await import("../server/loyaltyService");
+try {
+  if (process.env.NODE_ENV !== "development" || process.env.ALLOW_DEV_SEED !== "true" || !process.env.DATABASE_URL || !new URL(process.env.DATABASE_URL).pathname.endsWith("_dev")) throw new Error("Seed requires NODE_ENV=development, ALLOW_DEV_SEED=true and an isolated *_dev database");
+  const email = process.env.SEED_OWNER_EMAIL?.trim().toLowerCase(); const password = process.env.SEED_OWNER_PASSWORD;
+  if (!email || !password) throw new Error("Set SEED_OWNER_EMAIL and SEED_OWNER_PASSWORD; no default credentials are shipped");
+  const employeeEmail = process.env.SEED_EMPLOYEE_EMAIL; const employeePassword = process.env.SEED_EMPLOYEE_PASSWORD;
+  if (!employeeEmail || !employeePassword || employeeEmail.toLowerCase() === email) throw new Error("Set distinct SEED_EMPLOYEE_EMAIL and SEED_EMPLOYEE_PASSWORD");
+  if (await db.user.findUnique({ where: { email: employeeEmail.toLowerCase() } })) throw new Error("Seed employee already exists");
+  if (await db.user.findUnique({ where: { email } })) throw new Error("Seed account already exists; refusing to modify existing business data");
+  const owner = await register({ email, password });
+  const business = await createBusiness(owner, { business: { name: "Qaz Coffee", currency: "KZT", rewardRateBps: 500 }, customer: { name: "Ayan" } });
+  let invitationToken = "";
+  await inviteEmployee(owner, business.id, { email: employeeEmail }, { async send(message) { const link = new URL(message.text.match(/https?:\/\/\S+/)![0]); invitationToken = new URLSearchParams(link.hash.slice(1)).get("token")!; } });
+  await acceptInvitation({ token: invitationToken, password: employeePassword });
+  const first = (await listCustomers(owner, business.id, {})).items[0];
+  const members = [first];
+  for (const name of ["Dana", "Arman", "Aigerim", "Daniyar", "Asel", "Miras", "Aliya"]) members.push(await createCustomer(owner, business.id, { name }));
+  for (const member of members) await transactReward(owner, business.id, { type: "EARN", customerId: member.customerId, purchaseAmount: "10000", idempotencyKey: randomUUID(), description: "Development sample purchase" });
+  await transactReward(owner, business.id, { type: "EARN", customerId: first.customerId, purchaseAmount: "4000", idempotencyKey: randomUUID() });
+  await transactReward(owner, business.id, { type: "REDEEM", customerId: first.customerId, points: "100", idempotencyKey: randomUUID() });
+  console.log("Development seed complete: Qaz Coffee, 1 employee, 8 customers, 10 transactions. Demo page remains independent.");
+} finally { await db.$disconnect(); }

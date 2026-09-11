@@ -15,11 +15,11 @@ describe("Hardhat network configuration", function () {
 
   it("requires the RPC URL before a Sepolia command starts", () => {
     expect(() => validateSepoliaEnvironment("sepolia", {}))
-      .to.throw("SEPOLIA_RPC_URL is required for Sepolia");
+      .to.throw("SEPOLIA_RPC_URL is required for Sepolia deployment");
   });
 
-  it("allows read-only Sepolia commands without a private key", () => {
+  it("requires the private key before a Sepolia command starts", () => {
     expect(() => validateSepoliaEnvironment("sepolia", { SEPOLIA_RPC_URL: "https://rpc.example" }))
-      .not.to.throw();
+      .to.throw("PRIVATE_KEY is required for Sepolia deployment");
   });
 });
