@@ -7,3 +7,7 @@
   NODE_VERSION = "22"
   # NODE_ENV stays production; TypeScript/lint tooling is required during build.
   NPM_FLAGS = "--include=dev"
+
+# Explicitly enable the current OpenNext adapter for this API-created site.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
