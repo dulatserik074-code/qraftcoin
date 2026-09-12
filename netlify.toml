@@ -5,3 +5,5 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # NODE_ENV stays production; TypeScript/lint tooling is required during build.
+  NPM_FLAGS = "--include=dev"
