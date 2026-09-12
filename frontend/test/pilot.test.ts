@@ -31,3 +31,18 @@ test("production email rejects console delivery and never prints raw action link
   try { await assert.rejects(emailService.send({ to: "fixture@example.test", subject: "Reset", text: "raw-token-placeholder" })); assert.deepEqual(output, []); }
   finally { console.info = original; for (const [key,value] of Object.entries(old)) { if(value === undefined) delete process.env[key]; else process.env[key]=value; } }
 });
+
+test("explicit disabled email permits core production configuration but cannot deliver or log mail", async () => {
+  const disabled = { ...valid, EMAIL_PROVIDER: "disabled", EMAIL_API_KEY: "", EMAIL_FROM: "" };
+  assert.equal(validateEnvironment(disabled).emailProvider, "disabled");
+  const old = process.env; const oldFetch = globalThis.fetch; const oldLog = console.info;
+  let fetched = false; const output: unknown[] = [];
+  process.env = { ...disabled, NODE_ENV: "production" };
+  globalThis.fetch = async () => { fetched = true; throw Error("must not send"); };
+  console.info = (...args) => { output.push(args); };
+  try {
+    assert.equal((await health(async () => 1)).statusCode, 200);
+    await assert.rejects(emailService.send({to:"fixture@example.test",subject:"Reset",text:"private-action-token"}), /Email provider not configured/);
+    assert.equal(fetched, false); assert.deepEqual(output, []);
+  } finally { process.env = old; globalThis.fetch = oldFetch; console.info = oldLog; }
+});

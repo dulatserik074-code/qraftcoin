@@ -7,7 +7,7 @@ The complete application template is `frontend/.env.example`. Place real values 
 | Launch | NODE_ENV, NEXT_PUBLIC_APP_URL | production and actual HTTPS origin |
 | Database | DATABASE_URL | Neon pooled URL in runtime; direct URL in migration process |
 | Session and rate limits | AUTH_SECRET, RATE_LIMIT_SECRET | Independent random secrets, generated with 48 bytes each |
-| Email | EMAIL_PROVIDER, EMAIL_FROM, EMAIL_API_KEY | Current validator requires Resend in production |
+| Email | EMAIL_PROVIDER, EMAIL_FROM, EMAIL_API_KEY | Use disabled for core pilot; sender/key required with resend |
 | Deployment safety | TRUSTED_PROXY, BLOCKCHAIN_ENABLED, ALLOW_DEV_SEED | netlify, false, false |
 | Optional alias | APP_URL | If supplied, must match NEXT_PUBLIC_APP_URL |
 | Optional legacy | NEXT_PUBLIC_LEGACY_QFC_ADDRESS, NEXT_PUBLIC_QFC_ADDRESS, NEXT_PUBLIC_QFT_ADDRESS, NEXT_PUBLIC_QRAFT_PAYMENT_ADDRESS, NEXT_PUBLIC_REQUIRED_CHAIN_ID, NEXT_PUBLIC_NETWORK_NAME, NEXT_PUBLIC_BLOCK_EXPLORER_URL, NEXT_PUBLIC_LEGACY_PAYMENT_CODE_HASH | Public legacy configuration; leave disabled |
@@ -15,7 +15,7 @@ The complete application template is `frontend/.env.example`. Place real values 
 
 NEXT_RUNTIME is supplied by Next.js, not a user secret. NODE_VERSION=22 is set in netlify.toml. Legacy root Hardhat tooling additionally reads SEPOLIA_RPC_URL, PRIVATE_KEY and TREASURY_ADDRESS; these are not needed by the pilot and must not be added to Netlify.
 
-No database, session or email secret uses NEXT_PUBLIC_. Server configuration is protected by the server-only import. Registration/login do not send email, but the current global environment validator still requires email configuration. Do not substitute a fake production API key. The Resend onboarding sender is restricted to the provider account owner's recipient address until an owned sending domain is verified.
+No database, session or email secret uses NEXT_PUBLIC_. Server configuration is protected by the server-only import. Registration/login do not send email. EMAIL_PROVIDER=disabled explicitly permits the core pilot without email credentials. Email attempts fail without sending or logging links; password reset keeps its generic anti-enumeration response, and invitations fail with 503 and are revoked. Reset and invitation delivery remain unverified/unavailable until Resend is configured. Do not substitute a fake production API key. The Resend onboarding sender is restricted to the provider account owner's recipient address until an owned sending domain is verified.
 
 Migration procedure: supply the Neon direct URL as DATABASE_URL in a private process, then run `npx prisma migrate deploy` from frontend. Never run db:migrate, db:seed, db push or reset on production. Runtime DATABASE_URL remains pooled. No schema/history changes were required for this deployment.
 
