@@ -1,2 +1,3 @@
-import RecoveryForm from '@/components/RecoveryForm';
-export default function Page() { return <RecoveryForm mode="request"/>; }
+import Link from "next/link";
+import { Header } from "@/components/Header";
+export default function Page() { return <><Header/><main className="shell auth-shell"><h1>Восстановление пароля</h1><p>Отправка писем пока отключена в пилоте. Восстановить пароль по email сейчас нельзя. Если вы потеряли доступ, сообщите организатору пилота.</p><Link className="primary" href="/login">Вернуться ко входу</Link></main></>; }

@@ -1,6 +1,7 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { friendlyError } from "./friendlyError";
 import { Header } from "./Header";
 export default function AuthForm({ register = false }: { register?: boolean }) {
   const [error, setError] = useState(""); const [busy, setBusy] = useState(false);
@@ -11,7 +12,7 @@ export default function AuthForm({ register = false }: { register?: boolean }) {
       const result = await fetch(`/api/auth/${register ? "register" : "login"}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: form.get("email"), password: form.get("password") }) });
       const data = await result.json(); if (!result.ok) throw new Error(data.error);
       window.location.assign(register ? "/onboarding" : "/dashboard");
-    } catch (e) { setError(e instanceof Error ? e.message : "Unable to connect"); setBusy(false); }
+    } catch (e) { setError(friendlyError(e)); setBusy(false); }
   }
-  return <><Header/><main className="shell auth-shell"><span className="eyebrow">QAZLOYAL / BUSINESS ACCOUNT</span><h1>{register ? "Create your account" : "Welcome back"}</h1><form className="saas-panel saas-form" onSubmit={submit}><label>Email<input name="email" type="email" autoComplete="email" required maxLength={254}/></label><label>Password<input name="password" type="password" autoComplete={register ? "new-password" : "current-password"} minLength={12} maxLength={72} required/></label><p>Use 12–72 characters (at most 72 UTF-8 bytes).</p><button className="primary" disabled={busy}>{busy ? "Please wait…" : register ? "Create account" : "Sign in"}</button><p role="alert">{error}</p></form><p>{!register && <><Link href="/forgot-password">Forgot password?</Link> · </>}<Link href={register ? "/login" : "/register"}>{register ? "Already have an account? Sign in" : "Create a business account"}</Link> · <Link href="/demo">Try demo data</Link></p></main></>;
+  return <><Header/><main className="shell auth-shell"><span className="eyebrow">КАБИНЕТ ВЛАДЕЛЬЦА</span><h1>{register ? "Создайте аккаунт" : "Вход в QazLoyal"}</h1><form className="saas-panel saas-form" onSubmit={submit}><label>Email<input name="email" type="email" autoComplete="email" required maxLength={254}/></label><label>Пароль<input name="password" type="password" autoComplete={register ? "new-password" : "current-password"} minLength={12} maxLength={72} required/></label><p>Пароль: 12–72 латинских символа. Сохраните его: восстановление по email пока недоступно в пилоте.</p><button className="primary" disabled={busy}>{busy ? "Подождите…" : register ? "Зарегистрироваться" : "Войти"}</button><p role="alert">{error}</p></form><p><Link href={register ? "/login" : "/register"}>{register ? "Уже есть аккаунт? Войти" : "Создать аккаунт бизнеса"}</Link></p></main></>;
 }
